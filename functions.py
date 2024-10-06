@@ -61,7 +61,7 @@ tools = [
                 "description": "the search query",
             },
         },
-        'required': [],
+        'required': ['query'],
       },
     },
   },
