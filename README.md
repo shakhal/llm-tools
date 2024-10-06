@@ -2,7 +2,7 @@
 
 ## Overview
 
-`llm-tools` is a collection of scripts for interacting with and using external tools (functions) with large language models (LLMs) such as OpenAI, Anthropic, and Ollama. This project provides a unified interface to interact with different LLMs, making it easier to switch between them and utilize their unique capabilities.
+`llm-tools` demonstrates using external tools (functions) with large language models (LLMs) such as OpenAI, Anthropic, and Ollama. This project provides a unified interface to interact with different LLMs, making it easier to switch between them and utilize their unique capabilities.
 
 ## Installation
 
