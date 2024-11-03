@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
 import time
 import logging
-
+import string
 
 def get_current_time() -> str:
     """Get the current time"""
@@ -91,6 +91,10 @@ def google_search(query, num_results=10, language="en"):
         print(f"Error fetching search results: {e}")
         return []
 
+def remove_special_chars(text):
+    # Keep alphanumeric, whitespace, and punctuation
+    allowed_chars = string.ascii_letters + string.digits + ' .,'
+    return ''.join(char for char in text if char in allowed_chars)
 
 def browse_url(url: str) -> str:
     """
@@ -124,8 +128,12 @@ def browse_url(url: str) -> str:
             text = article_content.get_text(separator=' ', strip=True)
         else:
             text = soup.get_text(separator=' ', strip=True)
-            
+
+        # Remove special charactersp
+        text = remove_special_chars(text)        
+        print("text", text)
         return text.strip()
+    
         
     except requests.RequestException as e:
         logging.error(f"Request error: {e}")
@@ -136,6 +144,18 @@ def browse_url(url: str) -> str:
     
 
 tools = [
+    {
+        'type': 'function',
+        'function': {
+            'name': 'get_current_time',
+            'description': 'Get the current date',
+            'parameters': {
+                'type': 'object',
+                'properties': {},
+                'required': [],
+            },
+        },
+    },
     {
         'type': 'function',
         'function': {
