@@ -16,7 +16,7 @@ class GptClient():
             # Dynamically call the function
             if tool_name in self.tool_functions:
                 try:
-                    logging.info(f"Calling function: {tool_name}")
+                    logging.info(f"Calling function: {tool_name} {arguments}")
                     result = self.tool_functions[tool_name](**arguments)
                     tools_responses.append(str(result))
                 except Exception as error:
