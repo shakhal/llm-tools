@@ -16,7 +16,7 @@ def main():
     # Configure logging
     logging.basicConfig(level=args.logging, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    client = ClientProvider.provide("anthropic", 'claude-3-opus-20240229', tools, os.getenv('ANTHROPIC_API_KEY'), None)
+    client = ClientProvider.provide("anthropic", 'claude-3-5-sonnet-20241022', tools, os.getenv('ANTHROPIC_API_KEY'), None)
     engine = EngineProvider.provide("anthropic", client, prompt)
     engine.run();
 

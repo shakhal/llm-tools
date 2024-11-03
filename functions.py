@@ -148,19 +148,7 @@ tools = [
         'type': 'function',
         'function': {
             'name': 'get_current_time',
-            'description': 'Get the current date',
-            'parameters': {
-                'type': 'object',
-                'properties': {},
-                'required': [],
-            },
-        },
-    },
-    {
-        'type': 'function',
-        'function': {
-            'name': 'get_current_time',
-            'description': 'Get the current time',
+            'description': 'Get the current date and time',
             'parameters': {
                 'type': 'object',
                 'properties': {},

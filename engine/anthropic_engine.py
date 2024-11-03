@@ -16,7 +16,27 @@ class AnthropicEngine(GptEngine):
             messages=messages
         )
 
-        if message.stop_reason == 'tool_use':
+        text_func = extract_function_call(message.content[0].text)
+
+        if text_func:
+            function_name = text_func['function_name']
+            function_args = text_func['args'] | {}
+            func = {'function':{'name':function_name, 'arguments':function_args}};
+
+            result = self.client.use_tools([func])
+            messages.append({"role": "assistant", "content": 'Tool Use: '+ function_name + "(" + json.dumps(function_args) +")"})
+            messages.append({
+                "role": "user",
+                "content": json.dumps({
+                    "type": "tool_result",
+                    "tool_use_id": function_name,
+                    "content":str(result)
+                }),
+            })
+
+            return self.chat_with_model(messages, max_turns - 1)
+
+        elif message.stop_reason == 'tool_use':
             # Handle tool calls
             for i in range(1, len(message.content)):
                 function_name = message.content[i].name
@@ -26,7 +46,7 @@ class AnthropicEngine(GptEngine):
 
                 result = self.client.use_tools([func])
 
-                messages.append({"role": "assistant", "content": 'Tool Use: '+message.content[i].name + "(" + json.dumps(message.content[i].input) +")"})
+                messages.append({"role": "assistant", "content": 'Tool Use: '+ function_name + "(" + json.dumps(function_args) +")"})
                 messages.append({
                     "role": "user",
                     "content": json.dumps({
@@ -42,3 +62,28 @@ class AnthropicEngine(GptEngine):
             # Regular text response
             return message.content[0].text
 
+import re
+import json
+
+def extract_function_call(text):
+    # Look for 'Tool Use:' pattern
+    pattern = r'Tool Use:\s*(\w+)\((.*)\)'
+    
+    match = re.search(pattern, text)
+    
+    if match:
+        function_name = match.group(1)  # Get function name
+        args_str = match.group(2)       # Get arguments string
+        
+        try:
+            # Try to parse arguments as JSON
+            args = json.loads(args_str)
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return raw string
+            args = args_str
+            
+        return {
+            'function_name': function_name,
+            'args': args
+        }
+    return None
