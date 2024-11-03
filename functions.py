@@ -131,7 +131,6 @@ def browse_url(url: str) -> str:
 
         # Remove special charactersp
         text = remove_special_chars(text)        
-        print("text", text)
         return text.strip()
     
         
