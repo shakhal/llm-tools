@@ -2,6 +2,8 @@ import json
 from typing import List, Dict, Any
 import logging
 from .gpt_engine import GptEngine
+import re
+import json
 
 class AnthropicEngine(GptEngine):
     def __init__(self, client, prompt):
@@ -61,9 +63,6 @@ class AnthropicEngine(GptEngine):
         else:
             # Regular text response
             return message.content[0].text
-
-import re
-import json
 
 def extract_function_call(text):
     # Look for 'Tool Use:' pattern
