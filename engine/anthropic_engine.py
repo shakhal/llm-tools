@@ -22,7 +22,7 @@ class AnthropicEngine(GptEngine):
 
         if text_func:
             function_name = text_func['function_name']
-            function_args = text_func['args'] | {}
+            function_args = text_func['args'] or {}
             func = {'function':{'name':function_name, 'arguments':function_args}};
 
             result = self.client.use_tools([func])
