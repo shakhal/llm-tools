@@ -8,7 +8,7 @@
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/yourusername/llm-tools.git
+    git clone https://github.com/shakhal/llm-tools.git
     cd llm-tools
     ```
 
