@@ -57,22 +57,7 @@ def handle_direct_messages(message: Dict[str, Any], say: Any) -> None:
             
             logging.info(f"Processing message: {user_message} in channel: {channel_id}")
             
-            # Get conversation history
-            conversation = get_or_create_conversation(channel_id)
-            
-            # Add user message to history
-            conversation.append({
-                'role': 'user',
-                'content': user_message
-            })
-            
-            response = global_client.chat_with_model(conversation)
-            logging.debug(f"Assistant: {response}")
-            conversation.append({"role": "assistant", "content": response})
-
-            # Send response
-            say(response)
-            logging.info("Response sent successfully")
+            handle_message(channel_id, user_message, say)
             
         except Exception as e:
             logging.error(f"Error processing message: {str(e)}", exc_info=True)
@@ -88,30 +73,27 @@ def handle_mention(event: Dict[str, Any], say: Any) -> None:
         user_message = event["text"].split(">", 1)[1].strip()
         
         logging.info(f"Processing mention: {user_message} in channel: {channel_id}")
-        
-        # Get conversation history
-        conversation = get_or_create_conversation(channel_id)
-        
-        # Add user message to history
-        conversation.append({
-            'role': 'user',
-            'content': user_message
-        })
-        
-        # Generate response
-        response = global_client.chat_with_model(user_message, conversation)
-        logging.debug(f"Generated response: {response}")
-        
-        # Add assistant response to history
-        conversation.append({
-            'role': 'assistant',
-            'content': response
-        })
-        
-        # Send response
-        say(response)
-        logging.info("Response sent successfully")
-        
+
+        handle_message(channel_id, user_message, say)        
+    
     except Exception as e:
         logging.error(f"Error processing mention: {str(e)}", exc_info=True)
         say(f"Sorry, I encountered an error: {str(e)}")
+
+def handle_message(channel_id: str, user_message: str, say: Any) -> None: 
+    # Get conversation history
+    conversation = get_or_create_conversation(channel_id)
+    
+    # Add user message to history
+    conversation.append({
+        'role': 'user',
+        'content': user_message
+    })
+    
+    response = global_client.chat_with_model(conversation)
+    logging.debug(f"Assistant: {response}")
+    conversation.append({"role": "assistant", "content": response})
+
+    # Send response
+    say(response)
+    logging.info("Response sent successfully")
