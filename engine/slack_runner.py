@@ -9,6 +9,7 @@ load_dotenv()
 
 app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 global_client = None
+global_prompt = None
 conversations: Dict[str, list] = {}
 
 class SlackRunner:
@@ -17,6 +18,8 @@ class SlackRunner:
         self.prompt = prompt
         global global_client
         global_client = client
+        global global_prompt
+        global_prompt = prompt
         functions_desc = [ f["function"]["description"] for f in self.client.tools_schema]
         print("I am a chatbot able to do run some functions.", "Functions:\n\t",  "\n\t".join(functions_desc))
         print()
@@ -31,13 +34,6 @@ class SlackRunner:
             logging.error(f"Failed to start bot: {str(e)}", exc_info=True)
             raise
 
-
-def get_or_create_conversation(channel_id: str) -> list:
-    """Get existing conversation or create new one"""
-    if channel_id not in conversations:
-        logging.debug(f"Creating new conversation for channel: {channel_id}")
-        conversations[channel_id] = []
-    return conversations[channel_id]
 
 @app.message()
 def handle_direct_messages(message: Dict[str, Any], say: Any) -> None:
@@ -97,3 +93,10 @@ def handle_message(channel_id: str, user_message: str, say: Any) -> None:
     # Send response
     say(response)
     logging.info("Response sent successfully")
+
+def get_or_create_conversation(channel_id: str) -> list:
+    """Get existing conversation or create new one"""
+    if channel_id not in conversations:
+        logging.debug(f"Creating new conversation for channel: {channel_id}")
+        conversations[channel_id] = [{"role":'system', "content": global_prompt}]
+    return conversations[channel_id]
