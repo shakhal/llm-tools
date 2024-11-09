@@ -1,16 +1,32 @@
-import json
+import openai
+from .gptclient import GptClient
 from typing import List, Dict, Any
 import logging
+import json
 
-class OpenAiLlamaEngine():
-    def __init__(self, client, prompt):
-        self.client = client
+class OpenAiLlamaClient(GptClient):
+    def __init__(self, model, tools_schema, apikey, base_url):
+        super().__init__(tools_schema)
+        self.model = model
+        self.apikey = apikey
+        self.tools_schema = tools_schema
+        self.client = openai.OpenAI(
+            base_url = base_url,
+            api_key=apikey, 
+        )
 
+    def chat(self, messages):
+        return self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            tools=self.tools_schema,
+        )
+        
     def chat_with_model(self, messages: List[Dict[str, Any]], max_turns: int = 5) -> str:
         if max_turns <= 0:
             return "Max turns reached. Ending conversation."
 
-        response = self.client.chat(
+        response = self.chat(
             messages=messages
         )
 
@@ -32,7 +48,7 @@ class OpenAiLlamaEngine():
                 function_args = function_call.get("parameters", {})
         
                 func = {'function':{'name':function_name, 'arguments':function_args}};        
-                result = self.client.use_tools([func])
+                result = self.use_tools([func])
 
                 messages.append(message.model_dump())
                 messages.append({

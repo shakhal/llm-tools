@@ -1,9 +1,6 @@
 import logging
 import argparse
 from client.client_provider import ClientProvider
-from slack_bolt.adapter.socket_mode import SocketModeHandler
-from engine.engine_provider import EngineProvider
-from engine.cli_runner import CliRunner
 from engine.slack_runner import SlackRunner
 from prompts import prompt
 from functions import tools
@@ -18,8 +15,7 @@ def main():
     logging.basicConfig(level=args.logging, format='%(asctime)s - %(levelname)s - %(message)s')
 
     client = ClientProvider.provide("openai", 'gpt-4o', tools, os.getenv('OPENAI_API_KEY'))
-    engine = EngineProvider.provide("openai", client, prompt)
-    SlackRunner(client, engine, prompt).run()
+    SlackRunner(client, prompt).run()
 
 
 if __name__ == "__main__":

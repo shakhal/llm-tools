@@ -1,8 +1,7 @@
 class CliRunner:
-    def __init__(self, client, engine, prompt):
+    def __init__(self, client, prompt):
         self.client = client
         self.prompt = prompt
-        self.engine = engine
 
     # Main conversation loop
     def run(self):
@@ -20,7 +19,7 @@ class CliRunner:
             if user_input.strip() == "":
                 continue
             messages.append({"role": "user", "content": user_input})
-            response = self.engine.chat_with_model(messages)
+            response = self.client.chat_with_model(messages)
             print(f"Assistant: {response}")
             messages.append({"role": "assistant", "content": response})
 

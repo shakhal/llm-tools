@@ -8,15 +8,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = App(token=os.getenv("SLACK_BOT_TOKEN"))
-global_engine = None
+global_client = None
 conversations: Dict[str, list] = {}
 
 class SlackRunner:
-    def __init__(self, client, engine, prompt):
+    def __init__(self, client, prompt):
         self.client = client
         self.prompt = prompt
-        global global_engine
-        global_engine = engine
+        global global_client
+        global_client = client
         functions_desc = [ f["function"]["description"] for f in self.client.tools_schema]
         print("I am a chatbot able to do run some functions.", "Functions:\n\t",  "\n\t".join(functions_desc))
         print()
@@ -66,7 +66,7 @@ def handle_direct_messages(message: Dict[str, Any], say: Any) -> None:
                 'content': user_message
             })
             
-            response = global_engine.chat_with_model(conversation)
+            response = global_client.chat_with_model(conversation)
             logging.debug(f"Assistant: {response}")
             conversation.append({"role": "assistant", "content": response})
 
@@ -99,7 +99,7 @@ def handle_mention(event: Dict[str, Any], say: Any) -> None:
         })
         
         # Generate response
-        response = global_engine.chat_with_model(user_message, conversation)
+        response = global_client.chat_with_model(user_message, conversation)
         logging.debug(f"Generated response: {response}")
         
         # Add assistant response to history

@@ -1,3 +1,4 @@
+from .openai_llama_client import OpenAiLlamaClient
 from .ollama_client import OllamaClient
 from .openai_client import OpenAiClient  
 from .anthropic_client import AnthropicClient
@@ -10,6 +11,8 @@ class ClientProvider:
         logging.debug(json.dumps(tools, indent=4))
         if (type == 'openai'):
             return OpenAiClient(model, tools, apikey, base_url)
+        if (type == 'openai-llama'):
+            return OpenAiLlamaClient(model, tools, apikey, base_url)
         elif(type == 'ollama'):
             return OllamaClient(model, tools, apikey, base_url)
         elif(type == 'anthropic'):

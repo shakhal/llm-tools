@@ -1,7 +1,6 @@
 import logging
 import argparse
 from client.client_provider import ClientProvider
-from engine.engine_provider import EngineProvider
 from engine.slack_runner import SlackRunner
 from prompts import prompt
 from functions import tools
@@ -18,8 +17,7 @@ def main():
     logging.basicConfig(level=args.logging, format='%(asctime)s - %(levelname)s - %(message)s')
 
     client = ClientProvider.provide("anthropic", 'claude-3-5-sonnet-20241022', tools, os.getenv('ANTHROPIC_API_KEY'), None)
-    engine = EngineProvider.provide("anthropic", client, prompt)
-    SlackRunner(client, engine, prompt).run()
+    SlackRunner(client, prompt).run()
 
 if __name__ == "__main__":
     main()
