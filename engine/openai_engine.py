@@ -1,11 +1,9 @@
 import json
 from typing import List, Dict, Any
 import logging
-from .gpt_engine import GptEngine
 
-class OpenAiEngine(GptEngine):
+class OpenAiEngine():
     def __init__(self, client, prompt):
-        super().__init__(client, prompt)
         self.client = client
 
     def chat_with_model(self, messages: List[Dict[str, Any]], max_turns: int = 5) -> str:

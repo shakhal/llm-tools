@@ -1,7 +1,8 @@
-class GptEngine:
-    def __init__(self, client, prompt):
+class CliRunner:
+    def __init__(self, client, engine, prompt):
         self.client = client
         self.prompt = prompt
+        self.engine = engine
 
     # Main conversation loop
     def run(self):
@@ -19,7 +20,7 @@ class GptEngine:
             if user_input.strip() == "":
                 continue
             messages.append({"role": "user", "content": user_input})
-            response = self.chat_with_model(messages)
+            response = self.engine.chat_with_model(messages)
             print(f"Assistant: {response}")
             messages.append({"role": "assistant", "content": response})
 

@@ -1,6 +1,7 @@
 import logging
 import argparse
 from client.client_provider import ClientProvider
+from engine.cli_runner import CliRunner
 from engine.engine_provider import EngineProvider
 from prompts import prompt
 from functions import tools
@@ -20,7 +21,7 @@ def main():
 
     client = ClientProvider.provide("openai", 'gpt-4o', tools, os.getenv('OPENAI_API_KEY'))
     engine = EngineProvider.provide("openai", client, prompt)
-    engine.run()
+    CliRunner(client, engine, prompt).run()
 
 if __name__ == "__main__":
     main()

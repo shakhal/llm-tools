@@ -2,6 +2,7 @@ import logging
 import argparse
 from client.client_provider import ClientProvider
 from engine.engine_provider import EngineProvider
+from engine.cli_runner import CliRunner
 from prompts import prompt
 from functions import tools
 import os
@@ -18,7 +19,7 @@ def main():
 
     client = ClientProvider.provide("ollama", 'llama3.2:latest', tools, os.getenv('OLLAMA_API_KEY'), None)
     engine = EngineProvider.provide("ollama", client, prompt)
-    engine.run()
+    CliRunner(client, engine, prompt).run()
 
 if __name__ == "__main__":
     main()

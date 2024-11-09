@@ -1,8 +1,8 @@
 import logging
 import argparse
 from client.client_provider import ClientProvider
-from engine.cli_runner import CliRunner
 from engine.engine_provider import EngineProvider
+from engine.slack_runner import SlackRunner
 from prompts import prompt
 from functions import tools
 import os
@@ -17,9 +17,9 @@ def main():
     # Configure logging
     logging.basicConfig(level=args.logging, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    client = ClientProvider.provide("openai", 'meta-llama/Meta-Llama-3.1-405B-Instruct-FP8', tools, os.getenv('OLLAMA_API_KEY'), os.getenv('OLLAMA_HOST'))
-    engine = EngineProvider.provide("openai-llama", client, prompt)
-    CliRunner(client, engine, prompt).run()
+    client = ClientProvider.provide("anthropic", 'claude-3-5-sonnet-20241022', tools, os.getenv('ANTHROPIC_API_KEY'), None)
+    engine = EngineProvider.provide("anthropic", client, prompt)
+    SlackRunner(client, engine, prompt).run()
 
 if __name__ == "__main__":
     main()
