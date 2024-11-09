@@ -6,6 +6,8 @@ from prompts import prompt
 from functions import tools
 import os
 from dotenv import load_dotenv
+import os
+from dotenv import load_dotenv
 
 def main():
     load_dotenv()
