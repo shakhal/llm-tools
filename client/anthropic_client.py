@@ -48,22 +48,23 @@ class AnthropicClient(GptClient):
         text_func = extract_function_call(message.content[0].text)
 
         if text_func:
-            function_name = text_func['function_name']
-            function_args = text_func['args'] or {}
-            func = {'function':{'name':function_name, 'arguments':function_args}};
+            for text_func_i in text_func:
+                function_name = text_func_i['function_name']
+                function_args = text_func_i['args'] or {}
+                func = {'function':{'name':function_name, 'arguments':function_args}};
 
-            result = self.use_tools([func])
-            messages.append({"role": "assistant", "content": 'Tool Use: '+ function_name + "(" + json.dumps(function_args) +")"})
-            messages.append({
-                "role": "user",
-                "content": json.dumps({
-                    "type": "tool_result",
-                    "tool_use_id": function_name,
-                    "content":str(result)
-                }),
-            })
+                result = self.use_tools([func])
+                messages.append({"role": "assistant", "content": 'Tool Use: '+ function_name + "(" + json.dumps(function_args) +")"})
+                messages.append({
+                    "role": "user",
+                    "content": json.dumps({
+                        "type": "tool_result",
+                        "tool_use_id": function_name,
+                        "content":str(result)
+                    }),
+                })
 
-            return self.chat_with_model(messages, max_turns - 1)
+                return self.chat_with_model(messages, max_turns - 1)
 
         elif message.stop_reason == 'tool_use':
             # Handle tool calls
@@ -92,14 +93,39 @@ class AnthropicClient(GptClient):
             return message.content[0].text
 
 def extract_function_call(text):
-    # Look for 'Tool Use:' pattern
-    pattern = r'Tool Use:\s*(\w+)\((.*)\)'
+    results = []
+    # Split by "Tool Use:" to get all tool uses
+    tool_uses = text.split("Tool Use:")
     
-    match = re.search(pattern, text)
-    
-    if match:
-        function_name = match.group(1)  # Get function name
-        args_str = match.group(2)       # Get arguments string
+    for tool_use in tool_uses[1:]:  # Skip first empty part
+        tool_use = tool_use.strip()
+        if not tool_use:
+            continue
+            
+        # Find function name (text before first parenthesis)
+        open_paren = tool_use.find('(')
+        if open_paren == -1:
+            continue
+            
+        function_name = tool_use[:open_paren].strip()
+        
+        # Find matching closing parenthesis
+        stack = []
+        args_end = -1
+        for i, char in enumerate(tool_use[open_paren:], start=open_paren):
+            if char == '(':
+                stack.append(char)
+            elif char == ')':
+                stack.pop()
+                if not stack:  # Found matching closing parenthesis
+                    args_end = i
+                    break
+                    
+        if args_end == -1:  # No matching closing parenthesis found
+            continue
+            
+        # Extract arguments string
+        args_str = tool_use[open_paren + 1:args_end]
         
         try:
             # Try to parse arguments as JSON
@@ -108,8 +134,12 @@ def extract_function_call(text):
             # If JSON parsing fails, return raw string
             args = args_str
             
-        return {
+        results.append({
             'function_name': function_name,
             'args': args
-        }
-    return None
+        })
+    
+    if (results):
+        return results
+    else:
+        return None
